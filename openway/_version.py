@@ -18,5 +18,5 @@ class Version:
             try:
                 mj, mn, pt = s.split(".")
             except ValueError:
-                raise SyntaxError(f'legal formats for version number: major, "major", major.minor, "major.minor", "major.minor.patch"')
-            return cls(int(l[0]), int(l[1]), int(l[2]))
+                raise SyntaxError(f'legal formats for version number: major, "major", major.minor, "major.minor", "(v)major.minor.patch"')
+            return cls(int(mj), int(mn), int(pt))

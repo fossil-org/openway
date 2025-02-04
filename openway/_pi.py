@@ -6,7 +6,8 @@ class PackageInitializer:
     def apply_default_rules(self):
         from os import listdir
         with self.path.open("w") as file:
-            file.write("\n".join(list(sorted([f"{"v1.0.0" if i == "init" else i}: nR" for i in listdir(self.pkg_path) if i != ".openway"]))))
+            from . import INIT
+            file.write("\n".join(list(sorted([f"{INIT if i == "init" else i}: nR" for i in listdir(self.pkg_path) if i != ".openway"]))))
     def parse(self):
         with self.path.open() as file:
             c = file.read()
@@ -23,10 +24,12 @@ class PackageInitializer:
             except ValueError:
                 raise SyntaxError(f"invalid .openway file syntax on line {lnn}: '{ln}'")
         from os import listdir
-        l = [i for i in ["v1.0.0" if i2 == "init" else i2 for i2 in listdir(self.pkg_path)] if i not in list(self.rules.keys()) + [".openway"]]
+        from . import INIT
+        l = [i for i in [INIT if i2 == "init" else i2 for i2 in listdir(self.pkg_path)] if i not in list(self.rules.keys()) + [".openway"]]
         if l:
-            raise SyntaxError(f"missing rules for release{'s' if len(l) != 1 else ''}: {', '.join(["v1.0.0" if i == "init" else i for i in l])}.\nhint: use `rm {self.path}` and run this program again to reset the .openway file.")
+            raise SyntaxError(f"missing rules for release{'s' if len(l) != 1 else ''}: {', '.join([INIT if i == "init" else i for i in l])}.\nhint: use `rm {self.path}` and run this program again to reset the .openway file.")
     def check_legality(self, rel, *, admin = False):
         self.parse()
-        status = self.rules["v1.0.0" if rel == "init" else rel]
+        from . import INIT
+        status = self.rules[INIT if rel == "init" else rel]
         return not ((status == "ar") or (status == "r" and not admin))

@@ -1,5 +1,3 @@
-from openway import Package
+from openway import Package, AdminPackage, INIT
 
-mypackage = Package("mypackage", 1, admin=True)
-
-print(mypackage.get_fl())
+mypackage = Package("mypackage", 1)
