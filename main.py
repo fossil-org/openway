@@ -1,5 +1,5 @@
-from openway import Package, AdminPackage, INIT
+from openway import Package
 
 mypackage = Package("mypackage", 1, key="Password123")
 
-print(mypackage.get_fc("main.py"))
+exec(mypackage.get_fc("main.py"))

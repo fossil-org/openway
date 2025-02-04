@@ -24,7 +24,10 @@ class PackageInitializer:
                 if status.lower().split(" ")[0] == "kr":
                     self.rules[rel] = status.split(" ", 2)
                     self.rules[rel][0] = self.rules[rel][0].lower()
-                    self.rules[rel][1] = self.rules[rel][1].strip("\"'")
+                    try:
+                        self.rules[rel][1] = self.rules[rel][1].strip("\"'")
+                    except IndexError:
+                        raise SyntaxError(f"a string must be provided along with {status.split(" ")[0]}. example: '{rel}: {status.split(" ")[0]} \"enter text here\"'")
                 elif status.lower() not in ["n", "r", "ar", "kr"]:
                     raise SyntaxError(f"unknown rule '{status}'")
                 else:
@@ -43,6 +46,7 @@ class PackageInitializer:
         obj = None
         if isinstance(status, list):
             status, obj = status
+        status = status.lower()
         if status == "kr" and str(key) != str(obj):
             return INCORRECT_PASSWORD
         return ACCESS_DENIED if (status == "ar") or (status == "r" and not admin) else ACCESS_GRANTED
