@@ -15,9 +15,16 @@ class PackageInitializer:
     def parse(self):
         with self.path.open() as file:
             c = file.read()
+        comment = False
         for lnn, ln in enumerate(c.split("\n"), start=1):
-            ln = ln.strip()
-            if not ln:
+            ln = ln.strip().split("//", 2)[0]
+            if ln.startswith("/*"):
+                comment = True
+                continue
+            if "*/" in ln:
+                comment = False
+                ln = ln.split("*/", 2)[1]
+            if not ln or comment:
                 continue
             try:
                 rel, status = [i.strip() for i in ln.split(":", 2)]
