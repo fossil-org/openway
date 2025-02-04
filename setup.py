@@ -9,7 +9,7 @@ setup(
     version='1',
     author='fossil',
     author_email='fossil.org1@gmail.com',
-    description='lightweight installer for FOSSIL products',
+    description='local packages with version control, permissions, and cli support.',
     long_description=read_long_description(),
     long_description_content_type='text/markdown',
     packages=find_packages(),
@@ -20,9 +20,4 @@ setup(
     ],
     python_requires='>=3.12',
     install_requires=[],
-    entry_points={
-        'console_scripts': [
-            'gavel=gavel.core:main'
-        ]
-    },
 )
