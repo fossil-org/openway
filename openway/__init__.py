@@ -1,7 +1,7 @@
 INIT = "v1.0.0"
 
 class Package:
-    def __init__(self, name: str, version: str | int | None = None):
+    def __init__(self, name: str, version: str | int | None = None, *, key: str | None = None):
         self.name = name
         self.__admin = False
         from ._version import Version
@@ -22,7 +22,11 @@ class Package:
             with self.pi.path.open() as file:
                 if not file.read().strip():
                     self.pi.apply_default_rules()
-        if not self.pi.check_legality(self.version.to_string(), admin=self.__admin):
+        check = self.pi.check_legality(self.version.to_string(), key=key, admin=self.__admin)
+        from ._pi import INCORRECT_PASSWORD, ACCESS_DENIED
+        if check == INCORRECT_PASSWORD:
+            raise PermissionError(f"incorrect password provided to {name}/{self.version}. please contact the developers of {name} if you are unsure of the password.")
+        elif check == ACCESS_DENIED:
             raise PermissionError(f"no access to release {name}/{self.version}, please contact the developers of {name} for access.")
     def get_f(self, filename: str):
         return (self.rel_path / filename).open("r+")

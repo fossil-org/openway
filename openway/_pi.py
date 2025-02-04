@@ -1,3 +1,7 @@
+ACCESS_DENIED = 0
+ACCESS_GRANTED = 1
+INCORRECT_PASSWORD = 2
+
 class PackageInitializer:
     def __init__(self, path):
         self.path = path
@@ -17,10 +21,14 @@ class PackageInitializer:
                 continue
             try:
                 rel, status = [i.strip() for i in ln.split(":", 2)]
-                status = status.lower()
-                if status not in ["nr", "r", "ar"]:
+                if status.lower().split(" ")[0] == "kr":
+                    self.rules[rel] = status.split(" ", 2)
+                    self.rules[rel][0] = self.rules[rel][0].lower()
+                    self.rules[rel][1] = self.rules[rel][1].strip("\"'")
+                elif status.lower() not in ["n", "r", "ar", "kr"]:
                     raise SyntaxError(f"unknown rule '{status}'")
-                self.rules[rel] = status
+                else:
+                    self.rules[rel] = status
             except ValueError:
                 raise SyntaxError(f"invalid .openway file syntax on line {lnn}: '{ln}'")
         from os import listdir
@@ -28,8 +36,13 @@ class PackageInitializer:
         l = [i for i in [INIT if i2 == "init" else i2 for i2 in listdir(self.pkg_path)] if i not in list(self.rules.keys()) + [".openway"]]
         if l:
             raise SyntaxError(f"missing rules for release{'s' if len(l) != 1 else ''}: {', '.join([INIT if i == "init" else i for i in l])}.\nhint: use `rm {self.path}` and run this program again to reset the .openway file.")
-    def check_legality(self, rel, *, admin = False):
+    def check_legality(self, rel, *, key = None, admin = False):
         self.parse()
         from . import INIT
         status = self.rules[INIT if rel == "init" else rel]
-        return not ((status == "ar") or (status == "r" and not admin))
+        obj = None
+        if isinstance(status, list):
+            status, obj = status
+        if status == "kr" and str(key) != str(obj):
+            return INCORRECT_PASSWORD
+        return ACCESS_DENIED if (status == "ar") or (status == "r" and not admin) else ACCESS_GRANTED
